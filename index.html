@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>점프 배치표</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --bg:#f6f4ef; --surface:#fffdf9; --ink:#1d2320; --ink-2:#4b5650; --line:#e3ded3;
+  --on:#14684a; --on-bg:#dff1e7; --off:#6b6f6c; --off-bg:#ece9e2; --none-bg:#fbf1d9; --none:#7a5a0b;
+  --accent:#14684a; --focus:#0b4f9c;
+  --font:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#141815; --surface:#1b211d; --ink:#eef1ec; --ink-2:#aab4ad; --line:#2c352f;
+    --on:#7fd8ac; --on-bg:#1d3a2c; --off:#9aa39d; --off-bg:#262d28; --none-bg:#3a3010; --none:#e8c872; --accent:#7fd8ac; --focus:#8ec0ff}
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);font-feature-settings:"tnum"}
+::selection{background:var(--on-bg);color:var(--ink)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:4px}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 64px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;justify-content:space-between}
+h1{margin:0;font-size:clamp(1.5rem,4vw,2rem);letter-spacing:-.02em;text-wrap:balance}
+.sync{font-size:.8125rem;color:var(--ink-2);display:flex;align-items:center;gap:8px}
+.sync button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 10px;cursor:pointer}
+.sync button:hover{border-color:var(--ink-2)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--on)}
+.dot.err{background:#c0392b}
+.notice{margin:12px 0 0;font-size:.875rem;color:var(--ink-2)}
+
+.days{display:flex;gap:6px;overflow-x:auto;padding:16px 0 8px;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.day{flex:0 0 auto;min-width:48px;padding:6px 4px;border:1px solid var(--line);background:var(--surface);border-radius:10px;cursor:pointer;text-align:center;scroll-snap-align:center;line-height:1.2}
+.day b{display:block;font-size:1.0625rem}
+.day span{font-size:.75rem;color:var(--ink-2)}
+.day.sat span{color:#2f5fb3}.day.sun span{color:#c0392b}
+.day[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.day[aria-pressed=true] span{color:#fff}
+.day.today:not([aria-pressed=true]){border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}
+.tools input[type=search],.tools select{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.tools input[type=search]{flex:1 1 200px}
+.tabs{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.tabs button{min-height:44px;padding:0 14px;border:0;background:none;cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+
+.summary{display:flex;flex-wrap:wrap;gap:6px 18px;margin:4px 0 16px;font-size:.9375rem;color:var(--ink-2)}
+.summary strong{color:var(--ink);font-size:1.0625rem}
+
+.dept{margin:0 0 28px}
+.dept h2{margin:0 0 8px;font-size:1.0625rem;display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.dept h2 small{font-weight:400;color:var(--ink-2);font-size:.8125rem}
+.people{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:0 24px}
+.person{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.person .n{font-weight:600}
+.person .r{grid-column:1;font-size:.8125rem;color:var(--ink-2)}
+.tag{grid-row:1 / span 2;grid-column:2;font-size:.8125rem;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.tag.on{background:var(--on-bg);color:var(--on)}
+.tag.off{background:var(--off-bg);color:var(--off)}
+.tag.none{background:var(--none-bg);color:var(--none)}
+
+.grid-scroll{overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);max-height:75vh}
+table{border-collapse:separate;border-spacing:0;font-size:.8125rem;min-width:100%}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);white-space:nowrap;text-align:center}
+thead th{position:sticky;top:0;background:var(--surface);z-index:2}
+td.nm,th.nm{position:sticky;left:0;background:var(--surface);text-align:left;z-index:1;font-weight:600}
+thead th.nm{z-index:3}
+td.on{background:var(--on-bg);color:var(--on)} td.off{color:var(--off);background:var(--off-bg)} td.none{background:var(--none-bg)}
+th.sel,td.sel{box-shadow:inset 2px 0 0 var(--accent),inset -2px 0 0 var(--accent)}
+tr.sep td{background:var(--bg);padding:3px;border-right:0}
+.empty{padding:40px 0;text-align:center;color:var(--ink-2)}
+@media (prefers-reduced-motion:no-preference){
+  .person,.dept{animation:in .35s cubic-bezier(.16,1,.3,1) both}
+  @keyframes in{from{opacity:.001;transform:translateY(6px)}}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="title">점프 배치표</h1>
+    <div class="sync" role="status" aria-live="polite">
+      <span class="dot" id="dot"></span><span id="syncText">불러오는 중…</span>
+      <button id="refresh" type="button">새로고침</button>
+    </div>
+  </header>
+  <p class="notice" id="notice" hidden></p>
+
+  <div class="days" id="days" role="group" aria-label="날짜 선택"></div>
+
+  <div class="tools">
+    <input type="search" id="q" placeholder="이름·직책 검색" aria-label="이름 또는 직책 검색">
+    <select id="deptSel" aria-label="부서 필터"><option value="">전체 부서</option></select>
+    <select id="stateSel" aria-label="근무 상태 필터">
+      <option value="">전체</option><option value="근무">근무</option><option value="휴무">휴무</option>
+    </select>
+    <div class="tabs" role="group" aria-label="보기 방식">
+      <button type="button" id="vDay" aria-pressed="true">일별</button>
+      <button type="button" id="vMonth" aria-pressed="false">월간표</button>
+    </div>
+  </div>
+
+  <div id="summary" class="summary"></div>
+  <main id="out"></main>
+</div>
+
+<script>
+// ===== 설정: 시트를 바꾸려면 이 두 줄만 수정 =====
+const SHEET_ID = "19otaEU_Ju1E2naLVAmlrbiFuNaIMX82VDZSenmFJVdA";
+const GID = "654079607";
+const REFRESH_MS = 60_000;
+// ================================================
+const URL_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`;
+const $ = id => document.getElementById(id);
+const WD = ["일","월","화","수","목","금","토"];
+let data = null, selDay = null, view = "day";
+
+function parseCSV(t){
+  const rows=[]; let r=[], f="", q=false;
+  for(let i=0;i<t.length;i++){
+    const c=t[i];
+    if(q){ if(c=='"'){ if(t[i+1]=='"'){f+='"';i++} else q=false } else f+=c }
+    else if(c=='"') q=true;
+    else if(c==',') {r.push(f);f=""}
+    else if(c=='\n'){r.push(f);rows.push(r);r=[];f=""}
+    else if(c!='\r') f+=c;
+  }
+  if(f!==""||r.length){r.push(f);rows.push(r)}
+  return rows;
+}
+
+function build(rows){
+  // gviz CSV는 빈 행을 생략하므로 행 번호가 아니라 내용으로 헤더 위치를 찾는다.
+  const hi = rows.findIndex(r=>parseInt(r[3],10)===1 && parseInt(r[5],10)===2);
+  if(hi<0) throw new Error("날짜 헤더 행(1, 2, 3…)을 찾지 못했습니다");
+  const title = (rows.slice(0,hi).map(r=>(r[0]||"").trim()).find(t=>/배치표/.test(t))) || "점프 배치표";
+  const month = +(title.match(/(\d+)\s*월/)||[])[1] || (new Date().getMonth()+1);
+  const dayRow = rows[hi], wdRow = rows[hi+1]||[];
+  const days=[]; // {n, wd, col}
+  for(let c=3;c<dayRow.length;c++){
+    const n=parseInt(dayRow[c],10);
+    if(n>0) days.push({n, wd:(wdRow[c]||"").trim(), col:c});
+  }
+  const people=[]; let dept="";
+  for(let i=hi+2;i<rows.length;i++){
+    const r=rows[i]; const name=(r[0]||"").trim();
+    if(!name) continue;
+    const d=(r[1]||"").trim()||dept; dept=d;
+    people.push({name, dept:d, role:(r[2]||"").trim(),
+      cells:days.map(x=>({s:(r[x.col]||"").trim(), t:(r[x.col+1]||"").trim()}))});
+  }
+  return {title, month, days, people};
+}
+
+const cls = s => s==="근무"?"on":s==="휴무"?"off":"none";
+const lbl = s => s||"미정";
+const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function dayIndex(){
+  const i=data.days.findIndex(d=>d.n===selDay); return i<0?0:i;
+}
+
+function filtered(){
+  const q=$("q").value.trim().toLowerCase(), dp=$("deptSel").value, st=$("stateSel").value, di=dayIndex();
+  return data.people.filter(p=>
+    (!q || (p.name+p.role+p.dept).toLowerCase().includes(q)) &&
+    (!dp || p.dept===dp) &&
+    (!st || p.cells[di].s===st));
+}
+
+function renderDays(){
+  const now=new Date(), isMonth=now.getMonth()+1===data.month;
+  $("days").innerHTML=data.days.map(d=>{
+    const t=isMonth && d.n===now.getDate();
+    return `<button type="button" class="day ${d.wd==="토"?"sat":d.wd==="일"?"sun":""} ${t?"today":""}" data-n="${d.n}" aria-pressed="${d.n===selDay}" ${t?'aria-label="오늘 '+d.n+'일"':""}><b>${d.n}</b><span>${d.wd}</span></button>`;
+  }).join("");
+}
+
+function renderDay(list){
+  const di=dayIndex(), groups=new Map();
+  list.forEach(p=>{ if(!groups.has(p.dept)) groups.set(p.dept,[]); groups.get(p.dept).push(p) });
+  if(!list.length){ $("out").innerHTML=`<p class="empty">조건에 맞는 인원이 없습니다.</p>`; return }
+  $("out").innerHTML=[...groups].map(([dept,ps])=>{
+    const on=ps.filter(p=>p.cells[di].s==="근무").length;
+    return `<section class="dept"><h2>${esc(dept)}<small>근무 ${on} / ${ps.length}명</small></h2><ul class="people">${
+      ps.map(p=>{const c=p.cells[di];
+        return `<li class="person"><span class="n">${esc(p.name)}</span><span class="r">${esc(p.role)}${c.t&&c.s==="근무"?" · "+esc(c.t):""}</span><span class="tag ${cls(c.s)}">${lbl(c.s)}</span></li>`}).join("")
+    }</ul></section>`;
+  }).join("");
+}
+
+function renderMonth(list){
+  if(!list.length){ $("out").innerHTML=`<p class="empty">조건에 맞는 인원이 없습니다.</p>`; return }
+  let h=`<div class="grid-scroll"><table><thead><tr><th class="nm">이름</th>${
+    data.days.map(d=>`<th class="${d.n===selDay?"sel":""}">${d.n}<br><small>${d.wd}</small></th>`).join("")}</tr></thead><tbody>`;
+  let last=null;
+  list.forEach(p=>{
+    if(last!==null && p.dept!==last) h+=`<tr class="sep"><td colspan="${data.days.length+1}"></td></tr>`;
+    last=p.dept;
+    h+=`<tr><td class="nm">${esc(p.name)}</td>${p.cells.map((c,i)=>
+      `<td class="${cls(c.s)} ${data.days[i].n===selDay?"sel":""}" title="${esc(p.name)} ${data.days[i].n}일 ${lbl(c.s)}${c.t?" · "+esc(c.t):""}">${c.s==="근무"?(c.t?esc(c.t):"근"):c.s==="휴무"?"휴":"·"}</td>`).join("")}</tr>`;
+  });
+  $("out").innerHTML=h+`</tbody></table></div>`;
+}
+
+function render(){
+  if(!data) return;
+  const list=filtered(), di=dayIndex();
+  const on=data.people.filter(p=>p.cells[di].s==="근무").length;
+  const off=data.people.filter(p=>p.cells[di].s==="휴무").length;
+  $("summary").innerHTML=`<span>${data.month}월 ${selDay}일</span><span>근무 <strong>${on}</strong>명</span><span>휴무 <strong>${off}</strong>명</span>`;
+  view==="day"?renderDay(list):renderMonth(list);
+}
+
+function fillDepts(){
+  const cur=$("deptSel").value, ds=[...new Set(data.people.map(p=>p.dept))];
+  $("deptSel").innerHTML=`<option value="">전체 부서</option>`+ds.map(d=>`<option ${d===cur?"selected":""}>${esc(d)}</option>`).join("");
+}
+
+async function load(manual){
+  $("refresh").disabled=true;
+  try{
+    const res=await fetch(URL_CSV,{cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const text=await res.text();
+    if(/^\s*<(!doctype|html)/i.test(text)) throw new Error("시트가 비공개이거나 로그인이 필요합니다");
+    const first=!data;
+    data=build(parseCSV(text));
+    if(!data.days.length) throw new Error("날짜 헤더를 찾지 못했습니다");
+    $("title").textContent=data.title; document.title=data.title;
+    if(first || !data.days.some(d=>d.n===selDay)){
+      const now=new Date();
+      selDay = (now.getMonth()+1===data.month && data.days.some(d=>d.n===now.getDate())) ? now.getDate() : data.days[0].n;
+    }
+    fillDepts(); renderDays(); render();
+    $("dot").className="dot"; $("notice").hidden=true;
+    $("syncText").textContent="동기화 "+new Date().toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+    if(first) scrollToSel();
+  }catch(e){
+    $("dot").className="dot err";
+    $("syncText").textContent="동기화 실패";
+    $("notice").hidden=false;
+    $("notice").textContent=(data?"마지막으로 불러온 내용을 표시 중입니다. ":"")+"원인: "+e.message;
+  }finally{ $("refresh").disabled=false }
+}
+function scrollToSel(){
+  const b=document.querySelector('.day[aria-pressed="true"]'); b&&b.scrollIntoView({inline:"center",block:"nearest"});
+}
+
+$("days").addEventListener("click",e=>{
+  const b=e.target.closest(".day"); if(!b) return;
+  selDay=+b.dataset.n; renderDays(); render(); scrollToSel();
+});
+["q","deptSel","stateSel"].forEach(id=>$(id).addEventListener("input",render));
+$("vDay").onclick=()=>{view="day";$("vDay").setAttribute("aria-pressed",true);$("vMonth").setAttribute("aria-pressed",false);render()};
+$("vMonth").onclick=()=>{view="month";$("vMonth").setAttribute("aria-pressed",true);$("vDay").setAttribute("aria-pressed",false);render()};
+$("refresh").onclick=()=>load(true);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) load() });
+setInterval(()=>{ if(!document.hidden) load() },REFRESH_MS);
+load();
+</script>
+</body>
+</html>
