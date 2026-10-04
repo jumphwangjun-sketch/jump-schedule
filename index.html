@@ -42,6 +42,9 @@ svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:
 .shell{max-width:1180px;margin:0 auto;padding:20px 16px 56px}
 .top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;justify-content:space-between}
 h1{margin:0;font-size:clamp(1.35rem,3.6vw,1.75rem);letter-spacing:-.02em;font-weight:750;text-wrap:balance}
+.sumline{margin:4px 0 0;font-size:.875rem;color:var(--ink-2)}
+.sumline b{color:var(--ink);font-weight:650}
+.sumline .sep{margin:0 6px;color:var(--ink-3)}
 .sync{display:flex;align-items:center;gap:8px;font-size:.8125rem;color:var(--ink-2)}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--on)}
 .dot.err{background:var(--sun)}
@@ -49,10 +52,26 @@ h1{margin:0;font-size:clamp(1.35rem,3.6vw,1.75rem);letter-spacing:-.02em;font-we
 @keyframes pulse{50%{opacity:.35}}
 .icon-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;min-width:36px;padding:0 10px;border:1px solid var(--line);background:var(--surface);border-radius:9px}
 .icon-btn:hover{border-color:var(--ink-3)}
-.notice{margin:12px 0 0;padding:10px 12px;border:1px solid var(--line);background:var(--none-bg);color:var(--none);border-radius:10px;font-size:.875rem}
+.notice{margin:12px 0 0;padding:12px 14px;border:1px solid var(--line);background:var(--none-bg);color:var(--none);border-radius:10px;font-size:.875rem;line-height:1.55}
+.notice b{display:block;font-size:.9375rem;margin-bottom:2px}
+.notice ul{margin:6px 0 8px;padding-left:18px}
+.notice button{height:32px;padding:0 12px;border:1px solid currentColor;border-radius:8px;background:transparent;font-weight:600}
 
 /* 날짜 띠 */
-.dates{display:flex;gap:4px;overflow-x:auto;margin:16px -16px 0;padding:4px 16px 10px;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.datebar{display:flex;align-items:center;gap:10px;margin-top:12px}
+.quick{display:flex;gap:6px;flex:none}
+.chip{height:34px;padding:0 13px;border:1px solid var(--line);background:var(--surface);border-radius:999px;font-size:.8125rem;font-weight:620;color:var(--ink-2)}
+.chip:hover:not(:disabled){border-color:var(--ink-3);color:var(--ink)}
+.chip[aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.chip:disabled{opacity:.4;cursor:default}
+.star{all:unset;cursor:pointer;display:inline-flex;vertical-align:-3px;margin:-4px 6px -4px -6px;padding:4px;border-radius:6px;color:var(--ink-3)}
+.star svg{width:15px;height:15px}
+.star:hover{color:var(--ink)}
+.star[aria-pressed=true]{color:#d99a00}
+.star[aria-pressed=true] svg{fill:currentColor}
+.star:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.fav-g td{color:#9a6b00}
+.dates{flex:1;min-width:0;display:flex;gap:4px;overflow-x:auto;margin:0;padding:4px 0 10px;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
 .d{flex:0 0 auto;width:46px;padding:7px 0 6px;border:1px solid transparent;border-radius:10px;background:transparent;text-align:center;line-height:1.15;scroll-snap-align:center}
 .d b{display:block;font-size:1rem;font-weight:650}
 .d i{display:block;font-style:normal;font-size:.6875rem;color:var(--ink-3);margin-top:2px}
@@ -154,9 +173,28 @@ table.mx tr.grp td{padding:0 12px}
 .cal .x.pad{background:none}
 .legend{display:flex;gap:12px;margin-top:14px;font-size:.75rem;color:var(--ink-2)}
 
+.print-only{display:none}
+@media print{
+  html,body{background:#fff;color:#000}
+  .datebar,.bar,.notice,.foot,.veil,.drawer,.sync,.star{display:none!important}
+  .print-only{display:block;margin:0 0 6px;font-size:9pt;color:#444}
+  .shell{padding:0;max-width:none}
+  .top{margin-bottom:4px}
+  h1{font-size:15pt}
+  .panel{border:0;box-shadow:none;border-radius:0;background:#fff}
+  .scroll{max-height:none;overflow:visible}
+  thead th,tr.grp td,table.mx td.nm,table.mx th.nm{position:static}
+  table{font-size:8.5pt}
+  th,td{height:auto;padding:3px 6px}
+  table.mx th,table.mx td{height:auto;padding:2px 0}
+  table.mx td.nm{padding:2px 6px}
+  tr{break-inside:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 @media (max-width:720px){
   .hide-s{display:none}
-  th,td{padding:0 10px}
+  th,td{padding:0 8px}
+  .sumline{font-size:.8125rem}
   .scroll{max-height:none}
   tr.grp td{white-space:normal}
   tr.grp .cnt{font-size:.75rem;padding-right:0}
@@ -169,7 +207,7 @@ table.mx tr.grp td{padding:0 12px}
 <body>
 <div class="shell">
   <div class="top">
-    <h1 id="title">점프 배치표</h1>
+    <div><h1 id="title">점프 배치표</h1><p class="sumline" id="sumline"></p><p class="print-only" id="printHead"></p></div>
     <div class="sync" role="status" aria-live="polite">
       <span class="dot busy" id="dot"></span><span id="syncText">불러오는 중…</span>
       <button class="icon-btn" id="refresh" type="button" aria-label="새로고침"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button>
@@ -177,7 +215,7 @@ table.mx tr.grp td{padding:0 12px}
   </div>
   <div class="notice" id="notice" hidden></div>
 
-  <div class="dates" id="dates" role="group" aria-label="날짜 선택"></div>
+  <div class="datebar"><div class="quick"><button class="chip" id="goToday" type="button">오늘</button><button class="chip" id="goTomorrow" type="button">내일</button></div><div class="dates" id="dates" role="group" aria-label="날짜 선택"></div></div>
 
   <div class="bar">
     <label class="search"><span class="sr">검색</span>
@@ -187,6 +225,7 @@ table.mx tr.grp td{padding:0 12px}
     <select class="sel" id="dept" aria-label="부서"><option value="">전체 부서</option></select>
     <div class="seg" id="stSeg" role="group" aria-label="근무 상태"></div>
     <span class="spacer"></span>
+    <button class="toggle" id="favOnly" type="button" aria-pressed="false" title="즐겨찾기한 사람만 보기"><svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>즐겨찾기 <span id="favN"></span></button>
     <button class="toggle" id="grp" type="button" aria-pressed="true">
       <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h6"/></svg>부서별 묶기
     </button>
@@ -194,7 +233,8 @@ table.mx tr.grp td{padding:0 12px}
       <button id="vDay" type="button" aria-pressed="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/></svg>일별</button>
       <button id="vMonth" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/></svg>월간</button>
     </div>
-    <button class="icon-btn" id="csv" type="button" title="현재 목록을 CSV로 저장"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg><span class="hide-s">CSV</span></button>
+    <button class="icon-btn" id="print" type="button" title="인쇄 (표만 깔끔하게 출력)"><svg viewBox="0 0 24 24"><path d="M7 9V3h10v6M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="7" y="14" width="10" height="7" rx="1"/></svg><span class="sr">인쇄</span></button>
+    <button class="icon-btn" id="csv" type="button" title="현재 목록을 CSV로 저장"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg><span class="sr">CSV로 저장</span></button>
   </div>
 
   <section class="panel" aria-label="배치 목록">
@@ -225,7 +265,14 @@ const ORDER = {"근무":0,"":1,"휴무":2};
 const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const cls = s => s==="근무"?"on":s==="휴무"?"off":"none";
 const lbl = s => s||"미정";
-const ST = {data:null, day:null, view:"day", q:"", dept:"", st:"", group:true, sort:{k:null,dir:1}, open:null, closed:new Set(), lastFocus:null, loaded:false};
+const FAVKEY="jump-schedule-fav";
+const loadFav=()=>{try{return new Set(JSON.parse(localStorage.getItem(FAVKEY)||"[]"))}catch(e){return new Set()}};
+const saveFav=()=>{try{localStorage.setItem(FAVKEY,JSON.stringify([...ST.fav]))}catch(e){}};
+const ST = {fav:loadFav(), favOnly:false, data:null, day:null, view:"day", q:"", dept:"", st:"", group:true, sort:{k:null,dir:1}, open:null, closed:new Set(), lastFocus:null, loaded:false};
+const ICON_STAR='<svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>';
+const favKey=p=>p.name+"|"+p.dept;
+const isFav=p=>ST.fav.has(favKey(p));
+const starBtn=p=>`<button type="button" class="star" data-fav="${p.idx}" aria-pressed="${isFav(p)}" aria-label="${esc(p.name)} 즐겨찾기 ${isFav(p)?"해제":"추가"}">${ICON_STAR}</button>`;
 const ICON_CHEV = '<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>';
 const ICON_ARR = '<svg class="arr" viewBox="0 0 24 24" width="12" height="12"><path d="M12 5v14M6 13l6 6 6-6"/></svg>';
 
@@ -274,7 +321,7 @@ function baseList(){ // 상태 필터를 뺀 목록 (상태 버튼의 숫자 계
 }
 function viewList(){
   const i=di();
-  let l=baseList().filter(p=>!ST.st || p.cells[i].s===(ST.st==="미정"?"":ST.st));
+  let l=baseList().filter(p=>(!ST.st || p.cells[i].s===(ST.st==="미정"?"":ST.st)) && (!ST.favOnly || isFav(p)));
   const {k,dir}=ST.sort;
   if(k){
     const key = {name:p=>p.name, dept:p=>p.dept, role:p=>p.role, st:p=>ORDER[p.cells[i].s]??1}[k];
@@ -308,18 +355,21 @@ function weekIdx(i){
   return Array.from({length:e-s+1},(_,k)=>s+k);
 }
 function groups(list){
-  if(!ST.group) return [["",list]];
-  const m=new Map(); list.forEach(p=>{ if(!m.has(p.dept)) m.set(p.dept,[]); m.get(p.dept).push(p) });
-  return [...m];
+  const favs=list.filter(isFav), rest=ST.fav.size?list.filter(p=>!isFav(p)):list;
+  const out=[];
+  if(favs.length) out.push(["★ 즐겨찾기",favs]);
+  if(!ST.group){ if(rest.length) out.push(["",rest]); return out.length?out:[["",list]] }
+  const m=new Map(); rest.forEach(p=>{ if(!m.has(p.dept)) m.set(p.dept,[]); m.get(p.dept).push(p) });
+  return out.concat([...m]);
 }
 function renderDay(list){
-  const i=di(), wk=weekIdx(i), cols=3+3;
-  const head=`<thead><tr>${sortTh("name","이름")}${ST.group?"":sortTh("dept","부서")}${sortTh("role","직책","hide-s")}${sortTh("st","상태")}<th>업무</th><th class="hide-s"><span class="wkh">${wk.map(j=>`<span class="${j===i?"sel":""}">${ST.data.days[j].n}</span>`).join("")}</span></th></tr></thead>`;
+  const i=di(), wk=weekIdx(i), cols=3+3, sd=!ST.group||ST.fav.size>0;
+  const head=`<thead><tr>${sortTh("name","이름")}${sd?sortTh("dept","부서"):""}${sortTh("role","직책","hide-s")}${sortTh("st","상태")}<th>업무</th><th class="hide-s"><span class="wkh">${wk.map(j=>`<span class="${j===i?"sel":""}">${ST.data.days[j].n}</span>`).join("")}</span></th></tr></thead>`;
   const body=groups(list).map(([dept,ps])=>{
     const on=ps.filter(p=>p.cells[i].s==="근무").length, shut=ST.closed.has(dept);
-    const g=ST.group?`<tr class="grp ${shut?"closed":""}"><td colspan="${cols}"><button type="button" data-grp="${esc(dept)}" aria-expanded="${!shut}">${ICON_CHEV}${esc(dept)}<span class="cnt">근무 ${on} / ${ps.length}명</span></button></td></tr>`:"";
+    const g=dept?`<tr class="grp ${dept[0]==="★"?"fav-g":""} ${shut?"closed":""}"><td colspan="${cols}"><button type="button" data-grp="${esc(dept)}" aria-expanded="${!shut}">${ICON_CHEV}${esc(dept)}<span class="cnt">근무 ${on} / ${ps.length}명</span></button></td></tr>`:"";
     const rows=shut?"":ps.map(p=>{const c=p.cells[i];
-      return `<tr class="rec" tabindex="0" data-i="${p.idx}"><td class="nm">${esc(p.name)}</td>${ST.group?"":`<td>${esc(p.dept)}</td>`}<td class="hide-s task">${esc(p.role)}</td><td><span class="pill ${cls(c.s)}">${lbl(c.s)}</span></td><td class="task">${c.s==="근무"?esc(c.t):""}</td><td class="hide-s"><span class="wk">${wk.map(j=>`<i class="${cls(p.cells[j].s)} ${j===i?"sel":""}" title="${ST.data.days[j].n}일 ${lbl(p.cells[j].s)}"></i>`).join("")}</span></td></tr>`}).join("");
+      return `<tr class="rec" tabindex="0" data-i="${p.idx}"><td class="nm">${starBtn(p)}${esc(p.name)}</td>${sd?`<td>${esc(p.dept)}</td>`:""}<td class="hide-s task">${esc(p.role)}</td><td><span class="pill ${cls(c.s)}">${lbl(c.s)}</span></td><td class="task">${c.s==="근무"?esc(c.t):""}</td><td class="hide-s"><span class="wk">${wk.map(j=>`<i class="${cls(p.cells[j].s)} ${j===i?"sel":""}" title="${ST.data.days[j].n}일 ${lbl(p.cells[j].s)}"></i>`).join("")}</span></td></tr>`}).join("");
     return g+rows;
   }).join("");
   $("out").innerHTML=`<table>${head}<tbody>${body}</tbody></table>`;
@@ -329,18 +379,37 @@ function renderMonth(list){
   const head=`<thead><tr><th class="nm">이름</th>${days.map((d,j)=>`<th class="${d.w===6?"sat":d.w===0?"sun":""} ${j===i?"sel":""}"><button type="button" data-day="${d.n}">${d.n}<small>${esc(d.wd)}</small></button></th>`).join("")}</tr></thead>`;
   const body=groups(list).map(([dept,ps])=>{
     const shut=ST.closed.has(dept);
-    const g=ST.group?`<tr class="grp ${shut?"closed":""}"><td colspan="${cols}"><button type="button" data-grp="${esc(dept)}" aria-expanded="${!shut}">${ICON_CHEV}${esc(dept)}<span class="cnt">${ps.length}명</span></button></td></tr>`:"";
-    const rows=shut?"":ps.map(p=>`<tr class="rec" tabindex="0" data-i="${p.idx}"><td class="nm">${esc(p.name)}</td>${p.cells.map((c,j)=>`<td class="c ${cls(c.s)} ${j===i?"sel":""}" title="${esc(p.name)} ${days[j].n}일 ${lbl(c.s)}${c.t?" · "+esc(c.t):""}">${c.s==="근무"?"근":c.s==="휴무"?"휴":"·"}</td>`).join("")}</tr>`).join("");
+    const g=dept?`<tr class="grp ${dept[0]==="★"?"fav-g":""} ${shut?"closed":""}"><td colspan="${cols}"><button type="button" data-grp="${esc(dept)}" aria-expanded="${!shut}">${ICON_CHEV}${esc(dept)}<span class="cnt">${ps.length}명</span></button></td></tr>`:"";
+    const rows=shut?"":ps.map(p=>`<tr class="rec" tabindex="0" data-i="${p.idx}"><td class="nm">${starBtn(p)}${esc(p.name)}</td>${p.cells.map((c,j)=>`<td class="c ${cls(c.s)} ${j===i?"sel":""}" title="${esc(p.name)} ${days[j].n}일 ${lbl(c.s)}${c.t?" · "+esc(c.t):""}">${c.s==="근무"?"근":c.s==="휴무"?"휴":"·"}</td>`).join("")}</tr>`).join("");
     return g+rows;
   }).join("");
   $("out").innerHTML=`<table class="mx">${head}<tbody>${body}</tbody></table>`;
 }
+function todayIdx(offset=0){
+  const d=new Date(); d.setDate(d.getDate()+offset);
+  if(d.getMonth()+1!==ST.data.month) return -1;
+  return ST.data.days.findIndex(x=>x.n===d.getDate());
+}
+function renderMeta(){
+  const i=di(), d=ST.data.days[i], c={"근무":0,"휴무":0,"":0};
+  ST.data.people.forEach(p=>{c[p.cells[i].s]=(c[p.cells[i].s]||0)+1});
+  const nx=ST.data.days[i+1];
+  const nxOn=nx?ST.data.people.filter(p=>p.cells[i+1].s==="근무").length:null;
+  $("sumline").innerHTML=`${ST.data.month}월 ${d.n}일 ${esc(d.wd)}요일<span class="sep">·</span>근무 <b>${c["근무"]}</b>명<span class="sep">·</span>휴무 <b>${c["휴무"]}</b>명${c[""]?`<span class="sep">·</span>미정 <b>${c[""]}</b>명`:""}${nx?`<span class="sep">·</span>다음 날(${nx.n}일) 근무 <b>${nxOn}</b>명`:""}`;
+  const t=todayIdx(0), n=todayIdx(1);
+  const gt=$("goToday"), gn=$("goTomorrow");
+  gt.disabled=t<0; gt.setAttribute("aria-pressed",t>=0&&t===i);
+  gn.disabled=n<0; gn.setAttribute("aria-pressed",n>=0&&n===i);
+  $("favN").textContent=ST.fav.size?`(${ST.fav.size})`:"";
+  $("favOnly").setAttribute("aria-pressed",ST.favOnly);
+}
 function render(){
   if(!ST.data) return;
+  renderMeta();
   const list=viewList();
   renderSeg();
   if(!list.length){
-    $("out").innerHTML=`<div class="empty"><b>조건에 맞는 인원이 없습니다</b>검색어나 필터를 바꿔 보세요.</div>`;
+    $("out").innerHTML=ST.favOnly&&!ST.fav.size?`<div class="empty"><b>즐겨찾기한 사람이 없습니다</b>이름 옆 별을 눌러 추가하면 맨 위에 고정됩니다.</div>`:`<div class="empty"><b>조건에 맞는 인원이 없습니다</b>검색어나 필터를 바꿔 보세요.</div>`;
   } else ST.view==="day"?renderDay(list):renderMonth(list);
   const on=list.filter(p=>p.cells[di()].s==="근무").length;
   $("count").textContent=`${ST.data.month}월 ${ST.day}일 · ${list.length}명 표시 · 근무 ${on}명`;
@@ -399,10 +468,19 @@ async function load(){
     if(first) scrollToSel();
   }catch(e){
     $("dot").className="dot err"; $("syncText").textContent="동기화 실패";
-    $("notice").hidden=false;
-    $("notice").textContent=(ST.data?"마지막으로 불러온 내용을 보여주고 있습니다. ":"")+"원인: "+e.message;
+    showError(e);
     if(!ST.data) $("out").innerHTML=`<div class="empty"><b>데이터를 불러오지 못했습니다</b>잠시 후 새로고침해 주세요.</div>`;
   }finally{ $("refresh").disabled=false }
+}
+function showError(e){
+  const m=String(e&&e.message||e), hasData=!!ST.data;
+  let title="시트를 불러오지 못했습니다", tips=["인터넷 연결을 확인하고 다시 시도해 주세요."];
+  if(/비공개|HTTP 40[13]|HTTP 404/.test(m)){ title="시트에 접근할 수 없습니다"; tips=["구글 시트 공유 설정이 '링크가 있는 모든 사용자 – 뷰어'인지 확인하세요.","시트 주소나 탭(GID)이 바뀌지 않았는지 확인하세요."] }
+  else if(/날짜 헤더/.test(m)){ title="시트 형식이 달라졌습니다"; tips=["날짜(1, 2, 3…)가 있는 줄과 요일 줄이 그대로인지 확인하세요.","열 구성이 바뀌었다면 관리자에게 알려주세요."] }
+  else if(/HTTP 5\d\d/.test(m)){ title="구글 서버가 일시적으로 응답하지 않습니다"; tips=["잠시 뒤에 다시 시도해 주세요."] }
+  const n=$("notice"); n.hidden=false;
+  n.innerHTML=`<b>${esc(title)}</b>${hasData?"마지막으로 불러온 내용을 보여주고 있습니다.":""}<ul>${tips.map(t=>`<li>${esc(t)}</li>`).join("")}</ul><button type="button" id="retry">다시 시도</button> <span style="opacity:.75">(${esc(m)})</span>`;
+  $("retry").onclick=()=>load();
 }
 function scrollToSel(){ const b=document.querySelector('.d[aria-pressed="true"]'); b&&b.scrollIntoView({inline:"center",block:"nearest"}) }
 function setHash(){ try{ history.replaceState(null,"",`#d=${ST.day}${ST.view==="month"?"&v=month":""}`) }catch(e){} }
@@ -428,9 +506,20 @@ $("q").addEventListener("input",e=>{ST.q=e.target.value; render()});
 $("dept").addEventListener("change",e=>{ST.dept=e.target.value; render()});
 $("grp").addEventListener("click",()=>{ST.group=!ST.group; $("grp").setAttribute("aria-pressed",ST.group); render()});
 $("vDay").onclick=()=>setView("day"); $("vMonth").onclick=()=>setView("month");
-$("refresh").onclick=()=>load(); $("csv").onclick=()=>ST.data&&exportCSV();
+$("refresh").onclick=()=>load();
+$("goToday").onclick=()=>{const t=todayIdx(0); if(t>=0) setDay(ST.data.days[t].n)};
+$("goTomorrow").onclick=()=>{const t=todayIdx(1); if(t>=0) setDay(ST.data.days[t].n)};
+$("favOnly").onclick=()=>{ST.favOnly=!ST.favOnly; render()};
+$("print").onclick=()=>window.print();
+const pageStyle=document.createElement("style"); document.head.appendChild(pageStyle);
+window.addEventListener("beforeprint",()=>{
+  if(!ST.data) return;
+  pageStyle.textContent=`@page{size:A4 ${ST.view==="month"?"landscape":"portrait"};margin:10mm}`;
+  $("printHead").textContent=`${ST.data.month}월 ${ST.day}일 기준 · 출력 ${new Date().toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})}`;
+}); $("csv").onclick=()=>ST.data&&exportCSV();
 $("dClose").onclick=closeRec; $("veil").onclick=closeRec;
 $("out").addEventListener("click",e=>{
+  const f=e.target.closest("[data-fav]"); if(f){ const p=ST.data.people[+f.dataset.fav], k=favKey(p); ST.fav.has(k)?ST.fav.delete(k):ST.fav.add(k); saveFav(); return render() }
   const s=e.target.closest("[data-sort]"); if(s){ const k=s.dataset.sort; ST.sort = ST.sort.k===k ? (ST.sort.dir>0?{k,dir:-1}:{k:null,dir:1}) : {k,dir:1}; return render() }
   const g=e.target.closest("[data-grp]"); if(g){ const d=g.dataset.grp; ST.closed.has(d)?ST.closed.delete(d):ST.closed.add(d); return render() }
   const dd=e.target.closest("[data-day]"); if(dd) return setDay(+dd.dataset.day);
